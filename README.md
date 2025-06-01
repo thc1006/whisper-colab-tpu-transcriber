@@ -7,6 +7,8 @@
 
 > 不廢話 [Go to Colab Notebook](https://drive.google.com/file/d/1whpeuVN_HTxuwa11LV3cNhanz4wbSs6W/view?usp=sharing)
 
+> 實作成功影片：https://youtu.be/-xGwFZ32E2E 
+
 ## 1. Background
 OpenAI’s Whisper model is trained to process **up to 30s** of audio at a time (`max_source_positions=1500`).  
 - Whenever you input longer audio, the feature extractor will automatically truncate or pad to 30s.  
