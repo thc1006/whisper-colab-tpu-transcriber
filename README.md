@@ -31,16 +31,13 @@ OpenAI’s Whisper model is trained to process **up to 30s** of audio at a time 
 
 ## 3. Repo Structure
 
-
+```
 whisper-tpu-stream-transcription/
 ├── README.md
 ├── LICENSE
 ├── requirements.txt
-└── colab\_notebooks/
-    ├── 01\_install\_and\_dummy.ipynb      # Cell 1: 安裝套件 + Dummy 推論
-    ├── 02\_streaming\_transcription.ipynb # Cell 2: 流式 1h 轉錄
-    └── 03\_metrics\_inspection.ipynb      # Optional: 檢查 XLA Metrics
-
+└── whisper-tpu-colab-longform.ipynb
+```
 
 - **`README.md`**：本檔案，提供安裝、使用、技術說明。  
 - **`LICENSE`**：建議採用 MIT 或 Apache 2.0。  
