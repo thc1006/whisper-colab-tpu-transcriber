@@ -5,8 +5,9 @@
 
 > 可將長音檔（最長 1 小時）切片成 30 秒段，並透過重疊（overlap）策略推論，最終合併成一份中文逐字稿。
 
-## 1. Background
+> 不廢話 [Go to Colab Notebook](https://drive.google.com/file/d/1whpeuVN_HTxuwa11LV3cNhanz4wbSs6W/view?usp=sharing)
 
+## 1. Background
 OpenAI’s Whisper model is trained to process **up to 30s** of audio at a time (`max_source_positions=1500`).  
 - Whenever you input longer audio, the feature extractor will automatically truncate or pad to 30s.  
 - To fully transcribe a longer file (e.g., 1h), you must split it into consecutive 30s segments（或使用 longform transcription API），然後再將各段結果拼接。  
@@ -15,8 +16,6 @@ OpenAI’s Whisper model is trained to process **up to 30s** of audio at a time 
 1. 將 **最長 1 小時** 的音檔切成 30 秒 chunk（左右重疊 5 秒）。  
 2. 一段一段地把每 30 秒送到 TPU 做推論 (Whisper-small)。  
 3. 最後把所有 chunk 的中文文字串接成完整逐字稿。  
-
-> 不廢話 [點我前往 Colab Notebook](https://drive.google.com/file/d/1whpeuVN_HTxuwa11LV3cNhanz4wbSs6W/view?usp=sharing)
 
 
 ## 2. Features
