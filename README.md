@@ -1,8 +1,8 @@
 # High-Performance Whisper Transcription on Google Colab TPU
 
-> 點我使用：[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1FUrfNPB7mOfCz-DNYwtkNMXV0J1gwfma)
+> **點擊進入 Colab Notebook**：[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1FUrfNPB7mOfCz-DNYwtkNMXV0J1gwfma)
 
-> 本專案示範如何在 Google Colab 上，利用 TPU 加速 OpenAI Whisper 模型，對長音檔（可達數小時）進行分段轉錄，並自動輸出文字檔與效能統計 (RTF)。
+本專案示範如何在 Google Colab 上，利用 TPU 加速 OpenAI Whisper 模型，對長音檔（可達數小時）進行分段轉錄，並自動輸出文字檔與效能統計 (RTF)。
 
 ## 專案介紹
 在現代工作或研究裡，會議錄音、訪談錄音或上課錄影常常要轉成文字，但用自己電腦跑一整天都還沒跑完，或者只能去用那些要錢的雲端服務。這個專案就利用 Google Colab 提供的免費 TPU，再搭配 PyTorch/XLA 的高效能編譯，讓你能在短時間內把「長音檔拆段轉錄」，還自動幫你算出 Real-Time Factor (RTF) 來看速度到底快多少。整個流程只要在 Colab 裡面跑三個儲存格 (Cell)，就能體驗到超順暢、快如閃電的 Whisper 轉錄。
@@ -60,7 +60,8 @@ cd whisper-tpu-colab-longform
 ```
 
 2. **在瀏覽器打開 Colab Notebook**
-   點擊此徽章開啟 Notebook：[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1FUrfNPB7mOfCz-DNYwtkNMXV0J1gwfma)
+
+* 點此按鈕開啟 Notebook：[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1FUrfNPB7mOfCz-DNYwtkNMXV0J1gwfma)
 
 3. **切換 TPU 硬體加速器**
 在 Colab 中，依次點擊：
