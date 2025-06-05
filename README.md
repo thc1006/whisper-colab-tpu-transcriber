@@ -1,261 +1,151 @@
-# whisper-tpu-colab-longform
+# Whisper Speech Transcription Colab Notebook (TPU + PyTorch/XLA Accelerated)
 
-> **A TPU-accelerated pipeline to transcribe long audio (up to 1h)**  
-> Using OpenAI Whisper (PyTorch/XLA) on Google Colab, splitting into overlapping 30-second chunks, inferring on TPU, and stitching Chinese transcripts.
+> **Press here into**：[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1VxyV0rTyYpJ4CClTMNpatgVAOag-JrV4) Colab Notebook.
 
-> 可將長音檔（最長 1 小時）切片成 30 秒段，並透過重疊（overlap）策略推論，最終合併成一份中文逐字稿。
+🚀 This Google Colab Notebook provides an efficient and accurate solution for audio transcription and translation using OpenAI's Whisper model, accelerated on TPUs with PyTorch/XLA. It features an interactive user interface for easy customization of models, languages, and long-form audio processing parameters.
 
-> 不廢話 [Go to Colab Notebook](https://drive.google.com/file/d/1ArugLTgg2EqA6xarFO2O7CFBdOLbhGCT/view?usp=sharing)
+## ✨ Key Features
 
-> 實作成功影片：https://youtu.be/-xGwFZ32E2E 
+  * **High-Performance Transcription:** Significantly speeds up transcription using Google Colab's TPUs and PyTorch/XLA.
+  * **Multiple Whisper Models:** Supports various Whisper model sizes, from `tiny` to `large-v3`, allowing a trade-off between speed and accuracy.
+  * **Flexible Language Options:** Offers automatic language detection and manual selection for dozens of languages (including English, Chinese, Japanese, Korean, Spanish, French, German, etc.), plus custom ISO code input.
+  * **Transcription & Translation:** Perform speech-to-text in the original language (`transcribe`) or translate speech into English (`translate`).
+  * **Optimized Compute Precision:** Recommends `BF16` for optimal performance on TPUs, with `FP32` support.
+  * **Long-Form Audio Processing:** Implements chunking and striding mechanisms to effectively handle audio files longer than 30 seconds.
+  * **Interactive User Interface:** User-friendly GUI powered by `ipywidgets` for easy configuration of all transcription parameters.
+  * **XLA Warm-up:** Automatically performs an XLA warm-up step to compile the computation graph and optimize subsequent transcription performance.
+  * **Automated Environment Setup:** Handles the installation of necessary Python package dependencies, including `torch_xla` and `ffmpeg`.
 
-## 1. Background
-OpenAI’s Whisper model is trained to process **up to 30s** of audio at a time (`max_source_positions=1500`).  
-- Whenever you input longer audio, the feature extractor will automatically truncate or pad to 30s.  
-- To fully transcribe a longer file (e.g., 1h), you must split it into consecutive 30s segments（或使用 longform transcription API），然後再將各段結果拼接。  
+## 📋 Prerequisites
 
-本專案展示如何在 **Google Colab 的 TPU v2/v3** 上，利用 **PyTorch/XLA**：
-1. 將 **最長 1 小時** 的音檔切成 30 秒 chunk（左右重疊 5 秒）。  
-2. 一段一段地把每 30 秒送到 TPU 做推論 (Whisper-small)。  
-3. 最後把所有 chunk 的中文文字串接成完整逐字稿。  
+  * A Google Account (for accessing Google Colab).
+  * Basic understanding of Google Colab operations.
+  * (Optional) A GitHub account if you wish to save modified versions of the notebook to your own repository.
 
+## 🚀 Getting Started
 
-## 2. Features
+### 1\. Open the Notebook
 
-- **TPU 加速**：利用免費 Colab TPU，每個 30s chunk 只需約 2–5 秒推論。  
-- **流式讀取**：不需一次把整個音檔載入記憶體，使用 `SoundFile` 逐 chunk 讀取。  
-- **自動 Overlap 切片**：左右各延伸 5 秒，通常能減少在切點處「句子斷裂」的問題。  
-- **XLA Cached Compile**：只在第一個 Dummy 推論時做完整編譯，後續 chunk 都走快取，進而大幅加快推論速度。  
-- **可處理最長 1 小時音檔**：適合長時間會議、講座、Podcast 等錄音檔批次轉錄。  
-- **可輕易轉為 任何長度**：只要 `n_chunks = ceil(total_samples/480000)`，就能擴充支援更長音訊。  
+Click the [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1VxyV0rTyYpJ4CClTMNpatgVAOag-JrV4) badge above to open this notebook in Google Colab.
 
-
-## 3. Repo Structure
-
-```
-whisper-tpu-stream-transcription/
-├── README.md
-├── LICENSE
-├── requirements.txt
-└── whisper-tpu-colab-longform.ipynb
-```
-
-- **`README.md`**：本檔案，提供安裝、使用、技術說明。  
-- **`LICENSE`**：建議採用 MIT 或 Apache 2.0。  
-- **`requirements.txt`**：列出必要套件。  
-- **`colab_notebooks/`**：提供三個 Colab Notebook 範例，供直接在 Colab 執行、Demo。    
+> **Recommended:** Save a copy to your Google Drive by clicking **File** at the upper-left corner of the screen and selecting **Save a copy in Drive**. Then, rename the copied file (`FILENAME.ipynb`) to any name you prefer.
 
 
-## 4. Quick Start
+### 2\. Configure the Runtime
 
-### 4.1 Clone & Open Colab
+For optimal performance, it's recommended to use a TPU hardware accelerator:
 
-```bash
-!git clone https://github.com/你的帳號/whisper-tpu-colab-longform.git
-%cd whisper-tpu-colab-longform/colab_notebooks
-````
+1.  In the Colab menu, select **Runtime** -\> **Change runtime type**.
+2.  Under "Hardware accelerator," choose **TPU**.
+3.  Click **Save**.
 
-然後在 Colab 直接開啟 `01_install_and_dummy.ipynb`。
+### 3\. Run Cell 1: Install Packages & UI Setup
 
-### 4.2 Run Step 1: Install & Dummy TPU Test
+This cell performs the following actions:
 
-1. 開啟 `01_install_and_dummy.ipynb`。
-2. 執行第一格：
+1.  Installs all necessary Python packages, including `torch`, `torch_xla`, `transformers`, `ffmpeg`, etc.
+2.  **‼️ IMPORTANT:** After this cell finishes its first execution, Colab will prompt you to **Restart session**. You MUST click the button in the prompt or manually go to **Session -\> Restart session** (or **Runtime -\> Restart session**).
+3.  After restarting the session, **run Cell 1 again**. This time, it will skip the lengthy installation and display the interactive UI for configuring transcription parameters.
+4.  Adjust the settings in the UI according to your needs:
+      * **Whisper Model:** Choose the model size (e.g., `small`, `medium`, `large-v3`).
+      * **Transcription Language:** Select the language of your audio, or leave it as `auto` for automatic detection. If "Other" is selected, enter the [ISO 639-1 format](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes) (e.g., `de` for German) in the text box below.
+      * **Task:** `transcribe` (speech-to-text in original language) or `translate` (translate speech to English).
+      * **Compute Precision:** If using TPU, `bf16` is recommended. For CPU/GPU, use `fp32`.
+      * **Long Audio Processing (Advanced):**
+          * **Audio Chunk Length (s):** Duration of chunks for processing long audio (default 28-30s).
+          * **Left/Right Overlap (s):** Overlap between chunks to maintain context.
 
-   ```python
-   import os
-   os.environ["PT_XLA_DEBUG"] = "1"
-   # 安裝 torch, torch_xla, transformers, ffmpeg…
-   !pip uninstall -y torch torch_xla...
-   !pip install torch==2.6.0+cpu.cxx11.abi ...
-   !pip install "transformers>=4.39.0,<4.40.0" sentencepiece librosa soundfile
-   !apt update && apt install -y ffmpeg
-   # 匯入 torch / torch_xla & 檢查 TPU
-   import torch
-   import torch_xla.core.xla_model as xm
-   print("XLA devices:", xm.get_xla_supported_devices())
-   ```
-3. 執行第二格：
+### 4\. Run Cell 2: Load Model & XLA Warm-up
 
-   ```python
-   # Dummy Generate 測試
-   import numpy as np, time
-   silence = np.zeros(16000*30, dtype=np.float32)
-   feats = processor.feature_extractor(
-       silence, sampling_rate=16000, return_tensors="pt", return_attention_mask=True
-   )
-   input_feats = feats.input_features.to(device)
-   attn_mask   = feats.attention_mask.to(device)
-   decoder_prompt = torch.tensor([processor.get_decoder_prompt_ids("chinese","transcribe")[0]], device=device)
-   t0 = time.time()
-   _ = model.generate(input_feats, attention_mask=attn_mask, decoder_input_ids=decoder_prompt, max_length=model.config.max_target_positions)
-   print(f"Dummy 推理耗時: {time.time()-t0:.2f} 秒")
-   ```
-4. **檢查 XLA Metrics**（可選）：
+This cell will:
 
-   * 在 Dummy 推理結束後呼叫：
+1.  Load the specified Whisper model and its corresponding Processor from Hugging Face Hub based on your selections in Cell 1.
+2.  Move the model to the TPU (if available).
+3.  Initialize the Automatic Speech Recognition (ASR) Pipeline.
+4.  If using a TPU, it will perform a "warm-up" step. This involves compiling the XLA computation graph with a short dummy audio. This might take a few minutes but significantly speeds up subsequent processing of actual audio.
 
-     ```python
-     import torch_xla.debug.metrics as met
-     import torch_xla.core.xla_model as xm
-     met.clear_all()
-     xm.mark_step()
-     _ = model.generate(input_feats, attention_mask=attn_mask, decoder_input_ids=decoder_prompt, max_length=model.config.max_target_positions)
-     xm.mark_step()
-     print(met.short_metrics_report())
-     ```
-   * 確保 `ExecuteTime>0`、`UncachedCompile=1`、`CachedCompile=1`，表示該 graph 已編譯成功、實際運算落在 TPU。
+**Please be patient while this cell executes, especially the warm-up step.**
 
-> **注意**：若上述 `get_xla_supported_devices()` 回傳 `[]`，就表示 Runtime 沒有分配 TPU，需要在 Colab menu (`Runtime` → `Change runtime type`) 重新選擇「TPU」。
+### 5\. Run Cell 3: Upload Audio & Transcribe
 
-### 4.3 Run Step 2: 1h Streaming Transcription
+This cell will:
 
-1. 開啟 `02_streaming_transcription.ipynb`。
-2. 先執行前置斷言，確認 `processor` 與 `model` 都已在 Cell 1 載入。
+1.  Prompt you to upload one or more audio files (supports common formats like mp3, wav, m4a, ogg, flac).
+2.  Process each uploaded file for transcription.
+3.  During processing, it will display the audio duration, transcription time, and Real-Time Factor (RTF) for each file. A lower RTF indicates faster processing (RTF \< 1 means faster than real-time).
+4.  After transcription, a preview of the result will be shown.
+5.  The full transcript will be saved as a `.txt` file, named like `[original_filename]_transcript_[model_size]_[language].txt`.
+6.  You can find and download these `.txt` files from the "Files" panel (folder icon) on the left side of Colab.
+7.  Once all files are processed, overall statistics and final TPU memory usage will be displayed.
 
-   ```python
-   assert "processor" in globals() and "model" in globals()
-   ```
-3. 上傳一支**最長可達 1 小時**的音檔（Colab 可上傳檔案大小有上限，若 >100MB 建議先 copy 到 Google Drive，再以路徑載入）。
-4. 直接按「執行」整顆 Cell，Notebook 會自動：
+## 🛠️ Technical Details
 
-   1. 計算音檔總 sample、分段數（ n\_chunks ）。
-   2. 針對每段做重疊切片、特徵抽取、Whisper 推論。
-   3. 拼接文字並輸出到 `*.txt`。
-5. 執行結束後，左側「檔案」面板會看到新的 `*_1h_transcript.txt`，點擊即可下載。
+### PyTorch/XLA and TPUs
 
----
+This notebook leverages PyTorch/XLA (Accelerated Linear Algebra) to enable PyTorch models to run efficiently on Google's Tensor Processing Units (TPUs). TPUs are specialized hardware designed for large-scale machine learning computations. Using them with XLA can significantly accelerate inference for large models like Whisper. We recommend using `bfloat16` (BF16) mixed precision on TPUs to maximize performance and reduce memory footprint while maintaining acceptable accuracy.
 
-### 4.4 Optional: Inspect XLA Metrics (Step 3)
+### Long-Form Audio Processing
 
-1. 開啟 `03_metrics_inspection.ipynb`。
-2. 按步驟執行，確認每 N 塊 chunk 完成後呼叫 `short_metrics_report()`，觀察 `ExecuteTime>0`、`TransferTime` 等指標。
-3. 若發現 `ExecuteTime=0` 或多次 `Op(s) not lowered` → 代表該運算 fallback CPU，須檢查是否安裝或升級到支持該 op 的 PyTorch/XLA 版本，或改為 Kaggle TPU v4/v5 VM。
+OpenAI Whisper models have an input audio length limit (typically around 30 seconds). To handle longer audio files, the Hugging Face `transformers` pipeline implements a chunking and striding strategy:
 
----
+  * **`chunk_length_s`:** Long audio is divided into shorter chunks (e.g., 28 seconds).
+  * **`stride_length_s`:** An overlap is set between consecutive chunks (e.g., 5 seconds on each side). This overlap helps the model maintain contextual coherence at chunk boundaries, reducing information loss or transcription errors due to segmentation.
 
-## 5. How It Works
+You can adjust these parameters in the Cell 1 UI to suit different types of audio.
 
-### 5.1 Whisper’s 30s Input Limit
+### ipywidgets Interface
 
-* **原理**：Whisper 是 Seq2Seq 架構，**encoder** 一次能處理 **1500** 個 log-mel frames，對應 ≈ 30 秒 音訊。
-* **影響**：若輸入聲音長度 > 30 秒，`processor.feature_extractor` 會自動截斷至前 30 秒；若 < 30 秒 → 自動填充（padding）到 30 秒。
-* **參考**：
+For a more user-friendly experience, this notebook uses the `ipywidgets` library to create interactive controls. This allows users to easily adjust various transcription parameters—such as model selection, language, task type, and long-form audio settings—without directly modifying the code.
 
-  > > “`max_source_positions (int, defaults to 1500)`: The maximum sequence length of log-mel features that the model can process (≈ 30 秒). If your audio is longer, it will be truncated.”
+## 🔍 Troubleshooting
 
-### 5.2 Overlap Sliding Window Strategy
+  * **`ModuleNotFoundError: No module named 'torch_xla'` or related XLA errors:**
 
-* **為何重疊**：
+      * **Solution:** Ensure you have **correctly restarted the Colab session** after Cell 1's first execution, then re-run Cell 1 and Cell 2. This is the most common cause.
+      * Verify that the Colab runtime type is set to TPU.
 
-  * 直接把音檔切成連續的 30 秒集會產生「句子中段斷裂」問題，導致拼接時斷字不連續。
-  * **左右各重疊 5 秒**：第 i 段實際讀的是 `[i*30 s−5 s, i*30 s+30 s+5 s]` = `[i*30−5, i*30+35]`，但特徵抽取僅保留該區段「前 30 秒」＝ `[i*30−5, i*30+25]`。
-  * 第 (i+1) 段保留 `[ (i+1)*30−5 , (i+1)*30+25 ]` = `[i*30+25, i*30+55]`→ 前 5 秒與上段交疊 (`[i*30+25, i*30+30]`)，有重疊即可對齊句子，減少斷裂。
-* **實作重點**：
+  * **Out Of Memory (OOM) errors:**
 
-  1. `seg_start = max(0, mid_start−STRIDE_SMP)`
-  2. `seg_end = min(mid_start+CHUNK_SMP+STRIDE_SMP, total_samples)`
-  3. `processor.feature_extractor(audio)` → 先做 **truncation**（若超過 1500 frames）或 **padding**（若不足），最終傳給 model 的永遠是 30 秒。
-* **參考**：
+      * **Solution:**
+        1.  Try selecting a smaller Whisper model (e.g., `medium`, `small`, `base`, or `tiny`). `large` series models require more memory.
+        2.  Ensure compute precision is set to `bf16` when on TPU.
+        3.  "Restart session" to free all allocated resources, then run all cells from the beginning.
 
-  > > “Whisper feature extractor first pads/truncates any audio to 30 秒, then converts to log-Mel spectrogram.”
+  * **XLA warm-up takes too long or fails:**
 
-### 5.3 TPU Caching & Metrics
+      * **Solution:**
+        1.  Be patient; initial compilation, especially for larger models, can take a few minutes.
+        2.  Check the package installation logs in Cell 1 for errors.
+        3.  Try testing with a smaller model.
+        4.  Ensure a stable internet connection for downloading model files.
 
-* **Dummy 推論**：
+  * **File upload issues:**
 
-  1. 在 Cell 1 執行一次 `model.generate(...)` → 真正觸發 XLA 編譯（CompileTime 約 20–60 秒）。
-  2. 清空 metrics 並 `xm.mark_step()`，確保後續 chunk 使用同一 cached graph。
-  3. 第二次以後的 `generate` 只走 `ExecuteTime`，且 `CachedCompile > 0`、`UncachedCompile=1`、`ExecuteTime>0`。
-* **關鍵指標**：
+      * **Solution:** Ensure your internet connection is stable. If uploading large files causes issues, try uploading them in smaller batches or check Colab's file size limits.
 
-  * **`ExecuteTime`**：每次 chunk 實際執行在 TPU 上的累計時間；非零代表真的跑在 TPU。
-  * **`TransferToDeviceTime`** / **`TransferFromDeviceTime`**：Host↔TPU 傳輸時間，通常是數十 μs 到數十 ms。
-  * **`aten::xxx` Counter**：若看到大量 `aten::` 前綴的 ops，代表那些小操作 fallback 回 CPU，需要留意是否有瓶頸。
+  * **Poor transcription results:**
+
+      * **Solution:**
+        1.  Try specifying the correct audio language instead of relying on auto-detection.
+        2.  For audio with multiple languages or heavy accents, try a larger model (e.g., `large-v3`) for better accuracy.
+        3.  Check audio quality; excessive background noise or poor recording quality will affect results.
+        4.  Adjust the `chunk_length_s` and `stride_length_s` parameters for long-form audio processing.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the `LICENSE.md` file for details.
+
+## 🙏 Acknowledgements
+
+* My liver and the Student Community Active Learning Program of the Liberal Arts College at National Yang Ming Chiao Tung University.
+* The OpenAI Whisper team for providing the powerful speech-to-text model, and the ChatGPT team
+* The PyTorch/XLA developer community for full TPU support and metrics tools
+* Special thanks to the Google Colab team for continuously providing free TPU resources, allowing us to run inference experiments at low cost
+* [Hugging Face](https://huggingface.co/) for the `transformers` library and model hosting.
 
 ---
 
-## 6. Customization
-
-### 6.1 調整 Chunk/Stride 大小
-
-* 若覺得 `STRIDE_SEC=5 秒` 過多/過少，可自行修改。**重疊時間要保證 i 段 (i+1) 段文字能在該範圍內有足夠語意銜接**。
-
-  * 若過短（如 `STRIDE_SEC=2`），重疊區段語意連貫可能不足 → 句子仍會斷裂。
-  * 若過長（如 `STRIDE_SEC=10`），雖然連貫度高，但重疊段落冗餘度增加、總推論次數不變，但每次讀取的 audio 更長（42 秒 vs 40 秒），對 I/O 有輕微影響。
-
-### 6.2 後處理 / 去重疊（Deduplication）
-
-* **最簡版**：直接 `full_transcript = "".join(segments)`，保留所有重疊文字 → 較快。
-* **進階做法**：
-
-  1. 在 `batch_decode(..., return_timestamps=True)` 時取得每個 token 的 `(start_time, end_time)`。
-  2. 按 chunk 的實際「時間範圍」(mid−5s → mid+25s)，刪除早於 `prev_chunk_end` 的 token。
-  3. 串接剩餘文字，即可避免 5 秒重疊區段的重複輸出。
-* **示例**：可以參考 `scripts/postprocess.py` 內的時間戳對齊範例。
-
-### 6.3 使用 GPU 而非 TPU
-
-* 若 Colab 沒有取得 TPU，想在 Colab GPU T4 上執行：
-
-  1. 在 Colab 選擇「Runtime → Change runtime type → Hardware accelerator: GPU」。
-  2. 將 `device = torch.device("cuda" if torch.cuda.is_available() else "cpu")`。
-  3. 不需安裝 `torch_xla`，而改安裝 `torch` 對應 GPU 版本即可。
-
-> [點我前往 Colab Notebook](https://colab.research.google.com/drive/1ljb2EBTgmzr3QoJ61M4QNHivFgyMGx4H?usp=sharing)
-
----
-
-## 7. Requirements
-
-在 `requirements.txt` 中列出：
-
-```
-torch==2.6.0+cpu.cxx11.abi
-torch_xla==2.6.0        # 僅在 TPU 模式需要
-transformers>=4.39.0,<4.40.0
-sentencepiece
-librosa
-soundfile
-numpy
-```
-
-* 若只使用 GPU，可以移除 `torch_xla==2.6.0`。
-* 建議同時安裝 `xla[tpu]` 以確保所有依賴符合 PyTorch/XLA 在 TPU VM 上的需求。
-
-
-
-## 8. License
-
-本專案建議採用 **MIT License**，在 `LICENSE` 放入以下內容：
-
-```text
-MIT License
-
-Copyright (c) 2025 Hsiu-Chi Tsai (蔡秀吉)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the “Software”), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell  
-copies of the Software, and to permit persons to whom the Software is  
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,  
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE  
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER  
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN  
-THE SOFTWARE.
-```
-
-## 9. Acknowledgements
-
-* 秀吉的肝還有國立陽明交通大學博雅書苑的學生自主學習計畫
-* 感謝 OpenAI Whisper 團隊提供的強大語音轉文字模型和 ChatGPT 團隊。
-* 感謝 PyTorch/XLA 開發者社群提供完整 TPU 支援與 Metrics 工具。
-* 特別致謝 Colab 團隊持續提供免費 TPU 資源，讓我們能以低成本完成推論試驗。
+> **最後更新日期**：2025-06-05
+> **作者**：蔡秀吉 (Tsai Hsiu-Chi)
+> **電子郵件**：\[[hctsai@linux.com](mailto:your_email@example.com)] (可選)
+> **GitHub**：[@thc1006](https://github.com/thc1006)
