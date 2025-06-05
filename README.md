@@ -4,6 +4,8 @@
 
 🚀 This Google Colab Notebook provides an efficient and accurate solution for audio transcription and translation using OpenAI's Whisper model, accelerated on TPUs with PyTorch/XLA. It features an interactive user interface for easy customization of models, languages, and long-form audio processing parameters.
 
+> 這支 Google Colab Notebook，就是要用 OpenAI 的 Whisper 模型，再搭配 PyTorch/XLA 跑在 TPU 上，讓音檔轉錄跟翻譯又快又準。我還幫你做了互動式的操作介面，讓你自己可以選模型、挑語言，也能設定要怎麼處理超長音檔，整個流程都很方便。
+
 ## ✨ Key Features
 
   * **High-Performance Transcription:** Significantly speeds up transcription using Google Colab's TPUs and PyTorch/XLA.
