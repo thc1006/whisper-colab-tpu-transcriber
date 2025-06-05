@@ -5,7 +5,7 @@
 
 > 可將長音檔（最長 1 小時）切片成 30 秒段，並透過重疊（overlap）策略推論，最終合併成一份中文逐字稿。
 
-> 不廢話 [Go to Colab Notebook](https://drive.google.com/file/d/1whpeuVN_HTxuwa11LV3cNhanz4wbSs6W/view?usp=sharing)
+> 不廢話 [Go to Colab Notebook](https://drive.google.com/file/d/1ArugLTgg2EqA6xarFO2O7CFBdOLbhGCT/view?usp=sharing)
 
 > 實作成功影片：https://youtu.be/-xGwFZ32E2E 
 
