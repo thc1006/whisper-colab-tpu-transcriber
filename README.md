@@ -28,7 +28,7 @@
 
 ### 1\. Open the Notebook
 
-Click the [![Open in Colab](https://colab.research.google.com/drive/1ySiL1fKiscHyXZM1WYFv_q0ODqTxiMum) badge above to open this notebook in Google Colab.
+Click this badge [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1ySiL1fKiscHyXZM1WYFv_q0ODqTxiMum) to open this notebook in Google Colab.
 
 > **Recommended:** Save a copy to your Google Drive by clicking **File** at the upper-left corner of the screen and selecting **Save a copy in Drive**. Then, rename the copied file (`FILENAME.ipynb`) to any name you prefer.
 
