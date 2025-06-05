@@ -149,8 +149,9 @@ This project is licensed under the MIT License - see the `LICENSE.md` file for d
 
 ---
 
-> **最後更新日期**：2025-06-05
-> **作者**：蔡秀吉 (Tsai Hsiu-Chi)
-> **電子郵件**：\[[hctsai@linux.com](mailto:your_email@example.com)] (可選)
-> **GitHub**：[@thc1006](https://github.com/thc1006)
+> * **最後更新日期**：2025-06-05
+> * **作者**：蔡秀吉 (Tsai Hsiu-Chi)
+> * **電子郵件**：[hctsai@linux.com](mailto:hctsai@linux.com)
+> * **GitHub**：[@thc1006](https://github.com/thc1006)
+
 > 這支 Google Colab Notebook，就是要用 OpenAI 的 Whisper 模型，再搭配 PyTorch/XLA 跑在 TPU 上，讓音檔轉錄跟翻譯又快又準。我還幫你做了互動式的操作介面，讓你自己可以選模型、挑語言，也能設定要怎麼處理超長音檔，整個流程都很方便。
