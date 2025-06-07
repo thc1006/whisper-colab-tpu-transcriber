@@ -2,9 +2,11 @@
 
 > **Press here into**：[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1ySiL1fKiscHyXZM1WYFv_q0ODqTxiMum) Colab Notebook.
 
-🚀 This Google Colab Notebook provides an efficient and accurate solution for audio transcription and translation using OpenAI's Whisper model, accelerated on TPUs with PyTorch/XLA. It features an interactive user interface for easy customization of models, languages, and long-form audio processing parameters.（DEMO Video: https://youtu.be/nfZwfObWD-U）
+🚀 This Google Colab Notebook provides an efficient and accurate solution for audio transcription and translation using OpenAI's Whisper model, accelerated on TPUs with PyTorch/XLA. It features an interactive user interface for easy customization of models, languages, and long-form audio processing parameters.
 
-> To be honest, after testing, GPUs (using faster-whisper) still outperform TPUs. So guys if u want to run [**Whisper speech transcription on Colab GPU**](https://colab.research.google.com/drive/1ljb2EBTgmzr3QoJ61M4QNHivFgyMGx4H). there's the Code.
+> DEMO Video: https://youtu.be/nfZwfObWD-U
+
+> To be honest, after testing, **GPUs (using faster-whisper) still outperform TPUs.** So guys if u want to run [**Whisper speech transcription on Colab GPU**](https://colab.research.google.com/drive/1ljb2EBTgmzr3QoJ61M4QNHivFgyMGx4H). there's the Code.
 
 ## ✨ Key Features
 
