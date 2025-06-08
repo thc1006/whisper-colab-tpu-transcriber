@@ -1,6 +1,6 @@
 # Whisper Speech Transcription Colab Notebook (TPU + PyTorch/XLA Accelerated)
 
-> **Press here into**：[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1ySiL1fKiscHyXZM1WYFv_q0ODqTxiMum) Colab Notebook.
+> **Press here into**：[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1mFT8VYd9x_49V_U1z_fdNUIKJw_lUaMH) Colab Notebook.
 
 🚀 This Google Colab Notebook provides an efficient and accurate solution for audio transcription and translation using OpenAI's Whisper model, accelerated on TPUs with PyTorch/XLA. It features an interactive user interface for easy customization of models, languages, and long-form audio processing parameters.
 
@@ -30,7 +30,7 @@
 
 ### 1\. Open the Notebook
 
-Click this badge [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1ySiL1fKiscHyXZM1WYFv_q0ODqTxiMum) to open this notebook in Google Colab.
+Click this badge [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1mFT8VYd9x_49V_U1z_fdNUIKJw_lUaMH) to open this notebook in Google Colab.
 
 > **Recommended:** Save a copy to your Google Drive by clicking **File** at the upper-left corner of the screen and selecting **Save a copy in Drive**. Then, rename the copied file (`FILENAME.ipynb`) to any name you prefer.
 
