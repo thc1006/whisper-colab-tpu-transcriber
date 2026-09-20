@@ -1,3 +1,5 @@
+> # Important! Due to Colab's free TPU upgrading from v2-8 to v5e-1 and Transformers v5 dropping support for Flax, the old Whisper-JAX notebook can no longer be used directly. As a result, this project has been set as a Public Archive.
+
 # Whisper Speech Transcription Colab Notebook (TPU + PyTorch/XLA Accelerated)
 
 > **Press here into**：[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1mFT8VYd9x_49V_U1z_fdNUIKJw_lUaMH) Colab Notebook.
